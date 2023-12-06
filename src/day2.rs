@@ -1,6 +1,6 @@
+use regex::Regex;
 use std::fs;
 use std::io;
-use regex::Regex;
 
 pub fn solve() {
   println!("Part 1: {}", part1("inputs/day2/part1").unwrap());
@@ -27,7 +27,7 @@ fn part2(file: &str) -> io::Result<u32> {
 
   for line in input.lines() {
     let (red, green, blue) = get_max_colors(line);
-    total += red*green*blue;
+    total += red * green * blue;
   }
 
   Ok(total)
@@ -45,7 +45,7 @@ fn get_max_colors(line: &str) -> (u32, u32, u32) {
     match color {
       "red" => red = if red < number { number } else { red },
       "green" => green = if green < number { number } else { green },
-      "blue" => blue  = if blue < number { number } else { blue },
+      "blue" => blue = if blue < number { number } else { blue },
       _ => panic!("Unknown color: {}", color),
     }
   }

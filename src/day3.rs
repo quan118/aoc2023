@@ -182,7 +182,7 @@ fn part2(file: &str) -> io::Result<u32> {
           };
           let s = i * grid.ncol + (start_col as usize);
           let e = i * grid.ncol + (end_col + 1) as usize;
-          let str_slice: String = grid.data[s..e].iter().collect(); 
+          let str_slice: String = grid.data[s..e].iter().collect();
           let number = str_slice.parse::<u32>().unwrap();
           let gears = grid.get_adjacent_gears(i as i32, start_col, end_col);
 
