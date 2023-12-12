@@ -4,6 +4,7 @@ use std::io;
 
 pub fn solve() {
   println!("Part 1: {}", part1("inputs/day10/part1").unwrap());
+  println!("Part 2: {}", part2("inputs/day10/part1").unwrap());
 }
 
 fn part1(file: &str) -> io::Result<u64> {
@@ -15,6 +16,17 @@ fn part1(file: &str) -> io::Result<u64> {
   map[row * ncol + col] = '-';
 
   Ok((count_steps(&map, nrow, ncol, row, col) as f64 / 2.0).ceil() as u64)
+}
+
+fn part2(file: &str) -> io::Result<u64> {
+  let input = fs::read_to_string(file)?;
+  let nrow = input.lines().count();
+  let ncol = input.lines().next().unwrap().len();
+  let mut map = input.chars().filter(|c| *c != '\n').collect::<Vec<char>>();
+  let (row, col) = get_starting_position(&map, nrow, ncol);
+  map[row * ncol + col] = '-';
+
+  Ok(count_enclosed_tiles(&map, nrow, ncol, row, col))
 }
 
 fn count_steps(map: &Vec<char>, nrow: usize, ncol: usize, row: usize, col: usize) -> u64 {
@@ -124,4 +136,86 @@ fn get_starting_position(map: &Vec<char>, nrow: usize, ncol: usize) -> (usize, u
   }
 
   (row, col)
+}
+
+fn get_pipes_of_loop(
+  map: &Vec<char>,
+  nrow: usize,
+  ncol: usize,
+  start_row: usize,
+  start_col: usize,
+) -> HashSet<usize> {
+  let mut visited: HashSet<usize> = HashSet::new();
+  visited.insert(start_row * ncol + start_col);
+
+  let mut current_row = start_row;
+  let mut current_col = start_col;
+
+  loop {
+    let next_position = get_next_position(&map, nrow, ncol, current_row, current_col, &visited);
+    if next_position.is_none() {
+      break;
+    }
+    current_row = next_position.unwrap().0;
+    current_col = next_position.unwrap().1;
+    visited.insert(current_row * ncol + current_col);
+  }
+
+  visited
+}
+
+fn count_enclosed_tiles(
+  map: &Vec<char>,
+  nrow: usize,
+  ncol: usize,
+  start_row: usize,
+  start_col: usize,
+) -> u64 {
+  let pipes_of_loop = get_pipes_of_loop(map, nrow, ncol, start_row, start_col);
+  let mut is_inside = false;
+  let mut total: u64 = 0;
+  let mut entering_pipe: Option<char> = None;
+
+  for r in 0..nrow {
+    is_inside = false;
+    entering_pipe = None;
+    for c in 0..ncol {
+      let idx = r * ncol + c;
+      if pipes_of_loop.contains(&idx) {
+        match map[idx] {
+          '|' => {
+            if is_inside {
+              is_inside = false;
+              entering_pipe = None;
+            } else {
+              is_inside = true;
+              entering_pipe = Some('|');
+            }
+          }
+          'F' | 'L' => {
+            entering_pipe = Some(map[idx]);
+          }
+          '7' => {
+            if let Some(pipe) = entering_pipe {
+              if pipe == 'L' {
+                is_inside = !is_inside;
+              }
+            }
+          }
+          'J' => {
+            if let Some(pipe) = entering_pipe {
+              if pipe == 'F' {
+                is_inside = !is_inside;
+              }
+            }
+          }
+          _ => {}
+        }
+      } else if is_inside {
+        total += 1;
+      }
+    }
+  }
+
+  total
 }

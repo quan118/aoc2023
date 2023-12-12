@@ -9,6 +9,7 @@ mod day8;
 mod day9;
 mod day10;
 
+
 fn main() {
   let args: Vec<String> = std::env::args().collect();
   match args.get(1).map(|s| s.as_str()) {
