@@ -15,6 +15,7 @@ mod day21;
 mod day22;
 mod day23;
 mod day24;
+mod day25;
 mod day3;
 mod day4;
 mod day5;
@@ -50,6 +51,7 @@ fn main() {
     Some("day22") => day22::solve(),
     Some("day23") => day23::solve(),
     Some("day24") => day24::solve(),
+    Some("day25") => day25::solve(),
     _ => println!("Please specify a valid day"),
   }
 }
